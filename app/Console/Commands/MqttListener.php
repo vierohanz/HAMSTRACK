@@ -2,83 +2,70 @@
 
 namespace App\Console\Commands;
 
-use App\Models\collect;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Redis;
 use PhpMqtt\Client\MqttClient;
-use PhpMqtt\Client\ConnectionSettings;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class MqttListener extends Command
 {
     protected $signature = 'mqtt:listen';
-    protected $description = 'Listen to MQTT messages and store data to the database';
+    protected $description = 'Listen to MQTT messages and push them to a Redis buffer.';
 
     public function handle()
     {
         $host = env('MQTT_BROKER_HOST', 'localhost');
         $port = env('MQTT_BROKER_PORT', 1883);
-        $clientId = env('MQTT_CLIENT_ID', 'hamstrack');
-
-        $connectionSettings = (new ConnectionSettings)
-            ->setUsername(env('MQTT_BROKER_USERNAME'))
-            ->setPassword(env('MQTT_BROKER_PASSWORD'))
-            ->setKeepAliveInterval(60)
-            ->setUseTls(false);
+        $clientId = env('MQTT_CLIENT_ID', 'hamstrack-listener-' . uniqid());
 
         try {
             $mqtt = new MqttClient($host, $port, $clientId);
-            $mqtt->connect($connectionSettings);
-            echo "Connected to MQTT Broker!" . PHP_EOL;
+            $mqtt->connect();
+            $this->info("✅ Connected to MQTT Broker. Listening for messages...");
 
             $mqtt->subscribe('#', function (string $topic, string $message) {
-                echo "Received topic: $topic | Message: $message\n";
-                $now = now()->format('Y-m-d H:i');
-                $cacheKey = "weather_data_$now";
-                $data = Cache::get($cacheKey, []);
+                $this->line("Received topic: <fg=cyan>$topic</> | Message: <fg=yellow>$message</>");
 
-                // Deteksi topic dan simpan value sesuai jenis
+                $decodedMessage = json_decode($message);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return;
+                }
+
+                $metricKey = null;
                 switch (true) {
                     case str_starts_with($topic, 'PLN_NP_Testing_Iradian_'):
-                        $data['irradiance'] = (float) $message;
-                        break;
-                    case str_starts_with($topic, 'PLN_NP_Testing_WindSpeed_'):
-                        $data['wind_speed'] = (float) $message;
-                        break;
-                    case str_starts_with($topic, 'PLN_NP_Testing_WindDirection_'):
-                        $data['wind_direction'] = (float) $message;
+                        $metricKey = 'irradiance';
                         break;
                     case str_starts_with($topic, 'PLN_NP_Testing_Temperature_'):
-                        $data['temperature'] = (float) $message;
+                        $metricKey = 'temperature';
                         break;
                     case str_starts_with($topic, 'PLN_NP_Testing_Humidity_'):
-                        $data['humidity'] = (float) $message;
+                        $metricKey = 'humidity';
                         break;
                     case str_starts_with($topic, 'PLN_NP_Testing_AtmosphericPressure_'):
-                        $data['pressure'] = (float) $message;
+                        $metricKey = 'atmospheric_pressure';
+                        break;
+                    case str_starts_with($topic, 'PLN_NP_Testing_WindSpeed_'):
+                        $metricKey = 'wind_speed';
+                        break;
+                    case str_starts_with($topic, 'PLN_NP_Testing_WindDirection_'):
+                        $metricKey = 'wind_direction';
                         break;
                     case str_starts_with($topic, 'PLN_NP_Testing_RainFall_'):
-                        $data['rainfall'] = (float) $message;
+                        $metricKey = 'rainfall';
                         break;
                 }
 
-                // Simpan kembali ke cache
-                Cache::put($cacheKey, $data, now()->addMinutes(2));
-
-                $requiredFields = ['irradiance', 'wind_speed', 'wind_direction', 'temperature', 'humidity', 'pressure', 'rainfall'];
-                if (count(array_intersect_key(array_flip($requiredFields), $data)) === count($requiredFields)) {
-                    if (!Cache::has("weather_saved_$now")) {
-                        collect::create($data);
-                        Cache::put("weather_saved_$now", true, now()->addMinutes(2));
-                        echo "Data saved at $now: " . json_encode($data) . PHP_EOL;
-                    }
+                if ($metricKey && isset($decodedMessage->$metricKey)) {
+                    $value = (float) $decodedMessage->$metricKey;
+                    Redis::hSet('mqtt_data_buffer', $metricKey, $value);
+                    $this->comment("   -> '{$metricKey}' ({$value}) cached.");
                 }
             }, 0);
 
+            // Loop ini akan berjalan selamanya, dan hanya fokus mendengarkan.
             $mqtt->loop(true);
         } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage() . PHP_EOL;
-            Log::error("Error connecting to MQTT broker: " . $e->getMessage());
+            $this->error("❌ MQTT Listener Error: " . $e->getMessage());
         }
     }
 }
