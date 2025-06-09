@@ -1,53 +1,204 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const API_URL = "http://localhost:8000/api/allTable";
-    const tableBody = document.getElementById("prediction-table-body");
+// Fungsi utama untuk mengambil data dan merender chart
 
-    async function fetchAndDisplayPredictions() {
-        try {
-            // 1. Ambil data dari API
-            const response = await fetch(API_URL);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const jsonData = await response.json();
-            const predictions = jsonData.data || jsonData;
-            tableBody.innerHTML = "";
-            if (predictions.length === 0) {
-                tableBody.innerHTML =
-                    '<tr><td colspan="6" class="text-center p-4">No data found.</td></tr>';
-                return;
-            }
-            predictions.forEach((item, index) => {
-                const row = document.createElement("tr");
-                row.className =
-                    "bg-white border-b border-gray-300 hover:bg-gray-100 transition-colors duration-150";
-                row.innerHTML = `
-                <td class="w-4 p-4">
-                    <div class="flex items-center">
-                        <input id="checkbox-table-search-${
-                            index + 1
-                        }" type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded-sm focus:ring-blue-500 focus:ring-2" />
-                        <label for="checkbox-table-search-${
-                            index + 1
-                        }" class="sr-only">checkbox</label>
-                    </div>
-                </td>
-                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    ${item.date || "N/A"}
-                </th>
-                <td class="px-6 py-4">${item.irradiance || "N/A"}</td>
-                <td class="px-6 py-4">${item.temperature_c || "N/A"}</td>
-                <td class="px-6 py-4">${
-                    item.precipitation_mm_per_hr || "N/A"
-                }</td>
-                <td class="px-6 py-4">${item.humidity_percent || "N/A"}</td>
-            `;
-                tableBody.appendChild(row);
-            });
-        } catch (error) {
-            console.error("Could not fetch or display data:", error);
-            tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-4 text-red-500">Failed to load data. Please check the API connection and console for errors.</td></tr>`;
+async function renderChartFromAPI() {
+    try {
+        const response = await fetch("http://localhost:8000/api/halfTable");
+
+        if (!response.ok) {
+            throw new Error(`Gagal mengambil data: ${response.status}`);
         }
+
+        const apiData = await response.json();
+
+        const dataArray = apiData.data;
+
+        if (!Array.isArray(dataArray)) {
+            throw new Error(
+                "Struktur data dari API tidak valid. Kunci 'data' tidak berisi array."
+            );
+        }
+
+        const metricsToPlot = {
+            irradiance: { name: "Irradiance", color: "#4f46e5" },
+
+            temperature_c: { name: "Temperature (°C)", color: "#FF4500" },
+
+            humidity_percent: { name: "Humidity (%)", color: "#32CD32" },
+
+            precipitation_mm_per_hr: {
+                name: "Precipitation (mm/h)",
+
+                color: "#8A2BE2",
+            },
+        };
+
+        // ======================================================================
+
+        // PERUBAHAN 1: Kita tidak lagi butuh array 'categories'
+
+        // ======================================================================
+
+        const seriesData = {};
+
+        for (const key in metricsToPlot) {
+            seriesData[key] = [];
+        }
+
+        // 2. PROSES DATA DARI API DENGAN FORMAT [TIMESTAMP, VALUE]
+
+        dataArray.forEach((item) => {
+            const itemDate = new Date(item.date);
+
+            const timestamp = itemDate.getTime(); // Ambil timestamp milidetik
+
+            for (const key in metricsToPlot) {
+                const value = item.hasOwnProperty(key)
+                    ? parseFloat(item[key])
+                    : null;
+
+                // Masukkan data dalam format [x, y] yaitu [timestamp, value]
+
+                seriesData[key].push([timestamp, value]);
+            }
+        });
+
+        // 3. UBAH STRUKTUR DATA AGAR SESUAI DENGAN FORMAT APEXCHARTS
+
+        const finalSeries = Object.keys(metricsToPlot).map((key) => ({
+            name: metricsToPlot[key].name,
+
+            data: seriesData[key],
+
+            color: metricsToPlot[key].color,
+        }));
+
+        // ======================================================================
+
+        // 4. BUAT WAKTU SPESIFIK UNTUK ANOTASI
+
+        // ======================================================================
+
+        const annotationTime = new Date(); // Ambil tanggal hari ini
+
+        annotationTime.setHours(17, 0, 0, 0); // Atur waktunya ke jam 17:00:00
+
+        // 5. BUAT KONFIGURASI CHART
+
+        const dynamicChartConfig = {
+            series: finalSeries,
+
+            chart: {
+                height: 350,
+
+                type: "line",
+
+                zoom: { enabled: true },
+
+                toolbar: { autoSelected: "zoom" },
+            },
+
+            annotations: {
+                xaxis: [
+                    {
+                        // PERUBAHAN 2: Gunakan timestamp untuk posisi x yang presisi
+
+                        x: annotationTime.getTime(),
+
+                        borderColor: "#FF0000",
+
+                        label: {
+                            borderColor: "#FF0000",
+
+                            style: { color: "#fff", background: "#FF0000" },
+
+                            text: "Hari Ini 17:00", // Update teks label
+
+                            orientation: "horizontal",
+
+                            offsetY: -10,
+                        },
+                    },
+                ],
+            },
+
+            dataLabels: { enabled: false },
+
+            stroke: {
+                curve: "smooth",
+
+                width: 3,
+            },
+
+            // ======================================================================
+
+            // PERUBAHAN 3: KONFIGURASI XAXIS MENJADI TIPE 'DATETIME'
+
+            // ======================================================================
+
+            xaxis: {
+                type: "datetime", // Tipe sumbu-X diubah menjadi datetime
+
+                // 'categories' dihapus karena label dibuat otomatis dari timestamp
+
+                labels: {
+                    rotate: -45,
+
+                    style: { fontSize: "10px" },
+
+                    // Format tampilan label di sumbu-X
+
+                    datetimeUTC: false, // Tampilkan dalam zona waktu lokal
+
+                    format: "dd MMM HH:mm",
+                },
+            },
+
+            yaxis: {
+                labels: {
+                    formatter: (value) => (value ? value.toFixed(2) : "0"),
+                },
+            },
+
+            legend: {
+                position: "top",
+
+                horizontalAlign: "left",
+            },
+
+            tooltip: {
+                x: {
+                    format: "dd MMM yyyy HH:mm", // Format tooltip
+                },
+
+                shared: true,
+
+                intersect: false,
+            },
+
+            grid: {
+                borderColor: "#e7e7e7",
+            },
+        };
+
+        // 6. RENDER CHART
+
+        const chartElement = document.querySelector("#line-chart");
+
+        if (chartElement.hasChildNodes()) {
+            chartElement.innerHTML = "";
+        }
+
+        const chart = new ApexCharts(chartElement, dynamicChartConfig);
+
+        chart.render();
+    } catch (error) {
+        console.error("Error saat merender chart:", error);
+
+        document.querySelector("#line-chart").innerHTML =
+            "Gagal memuat data chart. Cek console (F12) untuk detail.";
     }
-    fetchAndDisplayPredictions();
-});
+}
+
+// Panggil fungsi utama untuk memulai seluruh proses
+
+renderChartFromAPI();

@@ -1,3 +1,5 @@
+@vite('resources/js/table.js')
+<link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css" />
 <div class="px-10 pt-26 pb-8">
     <div class="mb-5">
         <p class="split-text font-extrabold text-2xl sm:text-2xl md:text-4xl text-gray-800 leading-tight"
@@ -7,7 +9,29 @@
         </p>
     </div>
 
-    <div class="relative overflow-x-auto shadow-lg px-15 sm:rounded-4xl bg-gray-50">
+    <div class="relative flex flex-col mt-10 rounded-4xl bg-white bg-clip-border text-gray-700 shadow-md">
+        <div
+            class="relative mx-8 mt-4 flex flex-col gap-4 overflow-hidden rounded-none bg-transparent bg-clip-border text-gray-700 shadow-none md:flex-row md:items-center">
+            <div class="w-max rounded-lg bg-gray-100 p-5 text-white">
+                <img src="\assets\images\logo.png" alt="" class="w-7 h-6">
+            </div>
+            <div>
+                <h6
+                    class="block font-sans text-base font-semibold leading-relaxed tracking-normal text-blue-gray-900 antialiased">
+                    Analyst
+                </h6>
+                <p class="block max-w-sm font-sans text-sm font-normal leading-normal text-gray-700 antialiased">
+                    Visualize your data in a simple way.
+                </p>
+            </div>
+        </div>
+        <div class="pt-6 px-2 pb-0 ">
+            <div id="line-chart"></div>
+        </div>
+    </div>
+
+
+    <div class="relative mt-10 overflow-x-auto shadow-lg px-15 sm:rounded-4xl bg-gray-50">
         <div class="flex flex-col sm:flex-row items-center rounded-4xl justify-between gap-4 px-4 py-4">
             <!-- Select entries -->
             <div class="flex items-center gap-2">
@@ -60,6 +84,8 @@
         <div class="flex justify-center mt-4 mb-6" id="pagination"></div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

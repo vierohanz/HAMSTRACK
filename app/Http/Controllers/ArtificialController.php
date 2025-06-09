@@ -16,6 +16,13 @@ class ArtificialController extends Controller
         $table = artificial_intellegence::all();
         return ArtificialResource::collection($table);
     }
+
+    public function halfTable()
+    {
+        $table = artificial_intellegence::orderBy('id', 'desc')->take(70)->get();
+        return ArtificialResource::collection($table);
+    }
+
     public function postTable(ArtificialRequest $request): ArtificialResource
     {
         $validated = $request->validated();

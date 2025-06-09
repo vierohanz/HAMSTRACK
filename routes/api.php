@@ -11,4 +11,5 @@ Route::get('/latestCollect', [CollectController::class, 'latestCollect'])->name(
 
 //collect table
 Route::get('/allTable', [ArtificialController::class, 'allTable'])->name('allTable');
+Route::get('/halfTable', [ArtificialController::class, 'halfTable'])->name('halfTable');
 Route::post('/postTable', [ArtificialController::class, 'postTable'])->name('postTable');
