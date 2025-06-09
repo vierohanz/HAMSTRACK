@@ -1,0 +1,131 @@
+@keyframes waveHand {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    15% {
+        transform: rotate(20deg);
+    }
+
+    30% {
+        transform: rotate(-10deg);
+    }
+
+    45% {
+        transform: rotate(12deg);
+    }
+
+    60% {
+        transform: rotate(-8deg);
+    }
+
+    75% {
+        transform: rotate(8deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+.split-text span {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+    animation: splitIn 0.7s cubic-bezier(0.77, 0, 0.18, 1) forwards;
+}
+
+/* Gunakan CSS variable agar smooth dan scalable */
+.split-text span {
+    animation-delay: calc(0.045s * var(--i));
+}
+
+@keyframes splitIn {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+//ini yang baru untuk text gerak
+@keyframes rotateGradient {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+.btn-star-border {
+    position: relative;
+}
+
+.btn-star-border::before,
+.btn-star-border::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: calc(100% + 4px);
+    /* Sedikit lebih besar dari tombol untuk efek border */
+    height: calc(100% + 4px);
+    /* Sedikit lebih besar dari tombol untuk efek border */
+    border-radius: inherit;
+    /* Mengikuti border-radius tombol (rounded-lg) */
+    z-index: 0;
+    /* Di belakang konten tombol */
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+}
+
+.btn-star-border::before {
+    /* Gradien konik untuk efek kilauan berputar */
+    background: conic-gradient(
+        from 0deg,
+        rgba(255, 255, 255, 0.8),
+        /* Warna terang */ #4f46e5,
+        /* Warna utama Anda (misal: indigo-600) */ #a855f7,
+        /* Warna aksen lain (misal: purple-500) */ #ec4899,
+        /* Warna aksen lain (misal: pink-500) */ rgba(255, 255, 255, 0.8)
+            /* Kembali ke warna terang */
+    );
+    animation: rotateGradient 4s linear infinite paused;
+    /* Animasi berputar, awalnya di-pause */
+}
+
+/* Versi sederhana jika conic-gradient terlalu kompleks atau ingin efek lain */
+/* .btn-star-border::after {
+background: radial-gradient(circle at center, rgba(79, 70, 229, 0.5) 0%, rgba(79, 70, 229, 0) 70%);
+transform: translate(-50%, -50%) scale(1.2);
+} */
+
+.btn-star-border:hover::before {
+    opacity: 1;
+    animation-play-state: running;
+    /* Mulai animasi saat hover */
+}
+
+/* Dark mode adjustments untuk pseudo-element jika diperlukan */
+.dark .btn-star-border::before {
+    background: conic-gradient(
+        from 0deg,
+        rgba(255, 255, 255, 0.5),
+        /* Warna terang untuk dark mode */ #6366f1,
+        /* Indigo-500 */ #c084fc,
+        /* Purple-400 */ #f472b6,
+        /* Pink-400 */ rgba(255, 255, 255, 0.5)
+    );
+}
+
+/* Menjaga border asli tombol tetap terlihat atau menghilangkannya saat hover jika diinginkan */
+.btn-star-border:hover {
+    border-color: transparent;
+    /* Opsional: sembunyikan border asli saat efek muncul */
+}
+
+.dark .btn-star-border:hover {
+    border-color: transparent;
+    /* Opsional: sembunyikan border asli saat efek muncul */
+}

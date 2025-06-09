@@ -1,0 +1,155 @@
+.compass-direction {
+    position: absolute;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #9ca3af;
+    transition: all 0.3s ease;
+}
+
+.compass-direction[data-direction="N"] {
+    top: 6%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.compass-direction[data-direction="E"] {
+    top: 50%;
+    right: 6%;
+    transform: translateY(-50%);
+}
+
+.compass-direction[data-direction="S"] {
+    bottom: 6%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.compass-direction[data-direction="W"] {
+    top: 50%;
+    left: 6%;
+    transform: translateY(-50%);
+}
+
+@keyframes windAnimation {
+    0%,
+    100% {
+        transform: translate(-50%, -50%) rotate(var(--wind-angle, 45deg));
+    }
+
+    25% {
+        transform: translate(-50%, -50%)
+            rotate(calc(var(--wind-angle, 45deg) + 2deg));
+    }
+
+    50% {
+        transform: translate(-50%, -50%)
+            rotate(calc(var(--wind-angle, 45deg) - 1deg));
+    }
+
+    75% {
+        transform: translate(-50%, -50%)
+            rotate(calc(var(--wind-angle, 45deg) + 1deg));
+    }
+}
+
+.animate-wind {
+    animation: windAnimation 4s ease-in-out infinite;
+}
+
+//chart
+@property --shine-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
+.btn-shiny-border {
+    /* position: relative; /* Sudah ada dari kelas Tailwind */
+    /* overflow: hidden; /* Sudah ada dari kelas Tailwind */
+    /* border-radius: ...; /* Sudah ada dari rounded-lg Tailwind */
+    border: 1.5px solid transparent;
+    /* Atur ketebalan dasar border agar konsisten, akan ditimpa oleh pseudo-element */
+}
+
+.btn-shiny-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* Mengisi seluruh area tombol */
+    z-index: -1;
+    /* Diletakkan di belakang konten tombol */
+    border-radius: inherit;
+    /* Mengikuti border-radius tombol */
+
+    /* Gradien yang akan menjadi border berkilau */
+    /* Sesuaikan warna-warna ini dengan tema Anda. Kombinasi warna dasar border dan warna terang (putih/abu muda) untuk kilauan. */
+    background: conic-gradient(
+        from var(--shine-angle),
+        #d1d5db,
+        /* gray-300 sebagai warna dasar border yang terlihat saat tidak ada kilauan */
+            #f9fafb,
+        /* gray-50 / putih untuk kilauan */ #60a5fa,
+        /* biru muda untuk aksen kilauan */ #f9fafb,
+        /* kembali ke kilauan putih */ #d1d5db,
+        /* kembali ke warna dasar border */ #d1d5db /* sisanya warna dasar */
+    );
+
+    animation: rotate-shiny-border-gradient 4s linear infinite;
+    /* Animasi rotasi gradien */
+
+    /* Teknik Masking untuk membuat gradien hanya terlihat sebagai border */
+    padding: 1.5px;
+    /* HARUS SAMA dengan 'border-width' tombol di atas! Ini adalah ketebalan border visual. */
+    -webkit-mask:
+        /* Untuk Safari */ linear-gradient(#fff 0 0)
+            content-box,
+        linear-gradient(#fff 0 0);
+    mask:
+        /* Standar */ linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    /* atau destination-out */
+    mask-composite: exclude;
+    /* atau subtract */
+
+    opacity: 0;
+    /* Sembunyikan secara default */
+    transition: opacity 0.4s ease-in-out;
+}
+
+/* Penyesuaian untuk Dark Mode pada pseudo-element */
+.dark .btn-shiny-border::before {
+    background: conic-gradient(
+        from var(--shine-angle),
+        #4b5563,
+        /* gray-600 dark mode dasar border */ #e5e7eb,
+        /* gray-200 untuk kilauan di dark mode */ #93c5fd,
+        /* biru muda (blue-300) untuk aksen kilauan */ #e5e7eb,
+        #4b5563,
+        #4b5563
+    );
+}
+
+.btn-shiny-border:hover::before {
+    opacity: 1;
+    /* Tampilkan border berkilau saat hover */
+}
+
+/* Hapus border asli dari Tailwind saat hover agar tidak tumpang tindih */
+.btn-shiny-border:hover {
+    border-color: transparent !important;
+}
+
+.dark .btn-shiny-border:hover {
+    border-color: transparent !important;
+}
+
+@keyframes rotate-shiny-border-gradient {
+    0% {
+        --shine-angle: 0deg;
+    }
+
+    100% {
+        --shine-angle: 360deg;
+    }
+}
