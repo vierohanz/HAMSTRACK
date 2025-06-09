@@ -149,7 +149,7 @@ async function renderChartFromAPI() {
 
                     datetimeUTC: false, // Tampilkan dalam zona waktu lokal
 
-                    format: "dd MMM HH:mm",
+                    format: "dd MMM y HH:mm",
                 },
             },
 
