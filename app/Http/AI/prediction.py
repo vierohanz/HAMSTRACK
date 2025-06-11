@@ -7,10 +7,10 @@ import os
 
 # --- 1. KONFIGURASI ---
 MODEL_PATHS = {
-    'irradiance': r'C:\laragon\www\Hamstrack\app\Http\AI\irradiance_model.joblib',
-    'temperature_c': r'C:\laragon\www\Hamstrack\app\Http\AI\temperature_c_model.joblib',
-    'precipitation_mm_per_hr': r'C:\laragon\www\Hamstrack\app\Http\AI\precipitation_mm_per_hr_model.joblib',
-    'humidity_percent': r'C:\laragon\www\Hamstrack\app\Http\AI\humidity_percent_model.joblib'
+    'irradiance': r'C:\laragon\www\Hamstrack\app\Http\AI\irradiance_initial_model.joblib',
+    'temperature_c': r'C:\laragon\www\Hamstrack\app\Http\AI\temperature_c_initial_model.joblib',
+    'precipitation_mm_per_hr': r'C:\laragon\www\Hamstrack\app\Http\AI\precipitation_mm_per_hr_initial_model.joblib',
+    'humidity_percent': r'C:\laragon\www\Hamstrack\app\Http\AI\humidity_percent_initial_model.joblib'
 }
 API_URL = "http://localhost:8000/api/allTable"
 POST_URL = "http://localhost:8000/api/postTable" # URL untuk mengirim data prediksi
@@ -76,7 +76,8 @@ def run_prediction_pipeline(historical_df):
 
                 model = models[feature]
                 predicted_value = model.predict(input_for_prediction)[0]
-                predicted_value = abs(predicted_value)
+                # predicted_value = abs(predicted_value)
+                predicted_value = max(0, predicted_value)
                 new_prediction_row[feature] = predicted_value
 
             new_row_df = pd.DataFrame([new_prediction_row])

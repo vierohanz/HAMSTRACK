@@ -13,7 +13,7 @@
         <div
             class="relative mx-8 mt-4 flex flex-col gap-4 overflow-hidden rounded-none bg-transparent bg-clip-border text-gray-700 shadow-none md:flex-row md:items-center">
             <div class="w-max rounded-lg bg-gray-100 p-5 text-white">
-                <img src="\assets\images\logo.png" alt="" class="w-7 h-6">
+                <img src="\assets\images\logo_4.png" alt="" class="w-7 h-6">
             </div>
             <div>
                 <h6
