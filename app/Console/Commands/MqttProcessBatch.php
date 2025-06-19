@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\Log;
 class MqttProcessBatch extends Command
 {
     protected $signature = 'mqtt:process-batch';
-    protected $description = 'Saves whatever data is in the MQTT buffer every 5 seconds.';
+    protected $description = 'Saves whatever data is in the MQTT buffer every 300 seconds.';
 
-    const BATCH_INTERVAL = 3;
+    const BATCH_INTERVAL = 300;
 
     public function handle()
     {
