@@ -12,7 +12,7 @@ class MqttProcessBatch extends Command
     protected $signature = 'mqtt:process-batch';
     protected $description = 'Saves whatever data is in the MQTT buffer every 5 seconds.';
 
-    const BATCH_INTERVAL = 10;
+    const BATCH_INTERVAL = 3;
 
     public function handle()
     {

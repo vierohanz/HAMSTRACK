@@ -32,25 +32,25 @@ class MqttListener extends Command
 
                 $metricKey = null;
                 switch (true) {
-                    case str_starts_with($topic, 'PLN_NP_Testing_Iradian_'):
+                    case str_starts_with($topic, 'PLN_NP_Testing_Iradian_14'):
                         $metricKey = 'irradiance';
                         break;
-                    case str_starts_with($topic, 'PLN_NP_Testing_Temperature_'):
+                    case str_starts_with($topic, 'PLN_NP_Testing_Temperature_14'):
                         $metricKey = 'temperature';
                         break;
-                    case str_starts_with($topic, 'PLN_NP_Testing_Humidity_'):
+                    case str_starts_with($topic, 'PLN_NP_Testing_Humidity_14'):
                         $metricKey = 'humidity';
                         break;
-                    case str_starts_with($topic, 'PLN_NP_Testing_AtmosphericPressure_'):
+                    case str_starts_with($topic, 'PLN_NP_Testing_AtmosphericPressure_14'):
                         $metricKey = 'atmospheric_pressure';
                         break;
-                    case str_starts_with($topic, 'PLN_NP_Testing_WindSpeed_'):
+                    case str_starts_with($topic, 'PLN_NP_Testing_WindSpeed_14'):
                         $metricKey = 'wind_speed';
                         break;
-                    case str_starts_with($topic, 'PLN_NP_Testing_WindDirection_'):
+                    case str_starts_with($topic, 'PLN_NP_Testing_WindDirection_14'):
                         $metricKey = 'wind_direction';
                         break;
-                    case str_starts_with($topic, 'PLN_NP_Testing_RainFall_'):
+                    case str_starts_with($topic, 'PLN_NP_Testing_RainFall_14'):
                         $metricKey = 'rainfall';
                         break;
                 }
