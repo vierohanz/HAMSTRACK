@@ -71,6 +71,7 @@ def run_prediction_pipeline(historical_df):
                 input_for_prediction = np.array([last_n_points])
                 model = models[feature]
                 predicted_value = model.predict(input_for_prediction)[0]
+
                 predicted_value = max(0, predicted_value)
                 new_prediction_row[feature] = predicted_value
             new_row_df = pd.DataFrame([new_prediction_row])
