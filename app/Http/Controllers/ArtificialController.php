@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ArtificialRequest;
 use App\Http\Resources\ArtificialResource;
-use App\Models\artificial_intellegence;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
+use App\Http\Resources\PrediksiResources;
 use App\Http\Resources\SendMessageResources;
+use App\Models\artificial_intellegence;
+use App\Models\collect;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ArtificialController extends Controller
 {

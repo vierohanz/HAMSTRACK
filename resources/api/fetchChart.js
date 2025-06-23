@@ -8,7 +8,7 @@ async function fetchAndAnimate() {
         const fields = {
             humidity: { id: "humidity-box", unit: "%" },
             temperature: { id: "temperature-box", unit: "°C" },
-            rainfall: { id: "rainfall-box", unit: "L" },
+            rainfall: { id: "rainfall-box", unit: "mm" },
             irradiance: { id: "irradiance-box", unit: "W/m²" },
             wind_speed: { id: "wind_speed-box", unit: "m/s" },
             wind_direction: { id: "wind_direction-box", unit: "°" },

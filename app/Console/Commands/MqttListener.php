@@ -50,7 +50,7 @@ class MqttListener extends Command
                     case str_starts_with($topic, 'PLN_NP_Testing_WindDirection_14'):
                         $metricKey = 'wind_direction';
                         break;
-                    case str_starts_with($topic, 'PLN_NP_Testing_RainFall_'):
+                    case str_starts_with($topic, 'PLN_NP_Testing_RainFall_14'):
                         $metricKey = 'rainfall';
                         break;
                 }

@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Route;
 //collect table
 Route::get('/allCollect', [CollectController::class, 'allCollect'])->name('allCollect');
 Route::get('/latestCollect', [CollectController::class, 'latestCollect'])->name('latestCollect');
-
 //artifficial table
+Route::get('/predictionTable', [CollectController::class, 'predictionTable'])->name('predictionTable');
 Route::get('/allTable', [ArtificialController::class, 'allTable'])->name('allTable');
 Route::get('/halfTable', [ArtificialController::class, 'halfTable'])->name('halfTable');
 Route::post('/postTable', [ArtificialController::class, 'postTable'])->name('postTable');

@@ -140,7 +140,7 @@
                     <div class="items-start">
                         <div id="rainfall-box"
                             class="count-up text-black font-bold text-2xl sm:text-3xl md:text-3xl mt-1 sm:mt-2 mb-1">
-                            0 L
+                            0 mm
                         </div>
                         <div class="flex items-center gap-2 mb-1">
                             <span class="bg-red-100 text-green-500 text-xs font-semibold px-2 py-0.5 rounded-full">▲
